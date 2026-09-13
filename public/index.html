@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Jouez & Gagnez</title>
+<style>
+  :root{--rouge:#E2231A;--rougec:#FF6A4D;--fond:#1A0E2E;--fond2:#2A1450;--creme:#FDF3DF;--mute:#B9A6D6;}
+  *{box-sizing:border-box;} html,body{height:100%;margin:0;}
+  body{font-family:-apple-system,Segoe UI,Roboto,sans-serif;color:var(--creme);
+    background:radial-gradient(900px 600px at 50% 0%,#3A1D63,transparent 60%),linear-gradient(160deg,var(--fond),var(--fond2));
+    display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;}
+  .card{max-width:420px;width:100%;}
+  h1{font-size:28px;margin:0 0 10px;font-weight:900;}
+  p{color:var(--mute);font-size:17px;line-height:1.5;margin:0 0 22px;}
+  .big{font-size:52px;font-weight:900;color:var(--rougec);margin:8px 0;}
+  .spinner{width:46px;height:46px;border-radius:50%;margin:18px auto;
+    border:5px solid rgba(255,255,255,.15);border-top-color:var(--rouge);animation:spin 1s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .btn{display:inline-block;margin-top:8px;background:linear-gradient(180deg,#FF7A5C,var(--rouge) 60%,#A5120B);
+    color:#fff;font-weight:800;font-size:19px;text-decoration:none;padding:16px 34px;border-radius:999px;}
+  .note{font-size:12px;color:#7c6b96;margin-top:26px;}
+  .hidden{display:none;}
+</style>
+</head>
+<body>
+  <div class="card">
+    <div id="checking"><div class="spinner"></div><p>Vérification…</p></div>
+
+    <div id="ok" class="hidden">
+      <h1>C'est parti&nbsp;!</h1>
+      <p>Laissez-nous un avis sur Google, puis retournez à la borne : votre partie s'ouvre dans quelques secondes.</p>
+      <a id="goLink" class="btn" href="#">Laisser mon avis Google</a>
+    </div>
+
+    <div id="blocked" class="hidden">
+      <h1>Déjà joué&nbsp;!</h1>
+      <p>Une seule participation toutes les 12&nbsp;heures. Revenez dans&nbsp;:</p>
+      <div class="big" id="remaining">—</div>
+    </div>
+
+    <div id="error" class="hidden">
+      <h1>Oups</h1>
+      <p>Session introuvable. Rescannez le QR code sur la borne.</p>
+    </div>
+
+    <div class="note">Votre participation est enregistrée sur cet appareil.</div>
+  </div>
+
+<script>
+  /* ===================== RÉGLAGES ===================== */
+  var REVIEW_URL = "https://www.google.com/maps"; // votre lien d'avis Google
+  /* =================================================== */
+
+  function show(id){ ["checking","ok","blocked","error"].forEach(function(s){
+      document.getElementById(s).classList.toggle("hidden", s!==id); }); }
+
+  function deviceId(){
+    try{ var v=localStorage.getItem("de_device");
+      if(!v){ v=Date.now().toString(36)+Math.random().toString(36).slice(2); localStorage.setItem("de_device",v); }
+      return v;
+    }catch(e){ return "no-storage-"+Math.random().toString(36).slice(2); }
+  }
+
+  function getParam(n){ return new URLSearchParams(location.search).get(n); }
+
+  async function run(){
+    var sid = getParam("sid");
+    if(!sid){ show("error"); return; }
+    try{
+      var r = await fetch("/api/scan", {
+        method:"POST", headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({ sid: sid, deviceId: deviceId() })
+      });
+      var data = await r.json();
+      if(data.status === "allowed"){
+        document.getElementById("goLink").href = REVIEW_URL;
+        show("ok");
+      } else if(data.status === "blocked"){
+        var m = data.cooldownMinutes||0;
+        var h = Math.floor(m/60), min = m%60;
+        document.getElementById("remaining").textContent = (h>0? h+" h ":"") + min + " min";
+        show("blocked");
+      } else { show("error"); }
+    }catch(e){ show("error"); }
+  }
+  setTimeout(run, 500);
+</script>
+</body>
+</html>
