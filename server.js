@@ -20,7 +20,7 @@ app.use((req, res, next) => {
 // Sert le site du téléphone (dossier public/)
 app.use(express.static(path.join(__dirname, 'public')));
 
-const COOLDOWN_HOURS = 12;                      // <-- règle des 12h
+const COOLDOWN_HOURS = 0.01;                      // <-- règle des 12h
 const PLAYS_FILE = path.join(__dirname, 'plays.json');
 
 function loadPlays() { try { return JSON.parse(fs.readFileSync(PLAYS_FILE, 'utf8')); } catch { return {}; } }
