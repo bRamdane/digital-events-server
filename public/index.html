@@ -5,52 +5,136 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Jouez & Gagnez</title>
 <style>
-  :root{--rouge:#E2231A;--rougec:#FF6A4D;--fond:#1A0E2E;--fond2:#2A1450;--creme:#FDF3DF;--mute:#B9A6D6;}
-  *{box-sizing:border-box;} html,body{height:100%;margin:0;}
-  body{font-family:-apple-system,Segoe UI,Roboto,sans-serif;color:var(--creme);
-    background:radial-gradient(900px 600px at 50% 0%,#3A1D63,transparent 60%),linear-gradient(160deg,var(--fond),var(--fond2));
-    display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;}
-  .card{max-width:420px;width:100%;}
-  h1{font-size:28px;margin:0 0 10px;font-weight:900;}
-  p{color:var(--mute);font-size:17px;line-height:1.5;margin:0 0 22px;}
-  .big{font-size:52px;font-weight:900;color:var(--rougec);margin:8px 0;}
-  .spinner{width:46px;height:46px;border-radius:50%;margin:18px auto;
-    border:5px solid rgba(255,255,255,.15);border-top-color:var(--rouge);animation:spin 1s linear infinite;}
+  :root{
+    --rouge:#E2231A; --rouge-fonce:#A5120B; --rouge-clair:#FF6A4D;
+    --or:#F5C451; --or-clair:#FFE9A8; --or-fonce:#B87A18;
+    --creme:#FDF3DF; --sombre:#2A0A0A;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;}
+  body{
+    font-family:-apple-system,"Segoe UI",Roboto,system-ui,sans-serif;
+    color:var(--creme);
+    background:
+      radial-gradient(circle at 50% 16%, rgba(245,196,81,.22), transparent 55%),
+      linear-gradient(160deg,#C81E12,#7A0E08);
+    min-height:100%;
+    display:flex;align-items:center;justify-content:center;
+    padding:26px 22px;text-align:center;position:relative;overflow-x:hidden;
+  }
+  body::before{
+    content:"";position:fixed;inset:-45%;z-index:0;
+    background:repeating-conic-gradient(from 0deg at 50% 40%,
+      rgba(255,255,255,.05) 0deg 8deg, transparent 8deg 16deg);
+    animation:spin 70s linear infinite;pointer-events:none;
+  }
   @keyframes spin{to{transform:rotate(360deg)}}
-  .btn{display:inline-block;margin-top:8px;background:linear-gradient(180deg,#FF7A5C,var(--rouge) 60%,#A5120B);
-    color:#fff;font-weight:800;font-size:19px;text-decoration:none;padding:16px 34px;border-radius:999px;}
-  .note{font-size:12px;color:#7c6b96;margin-top:26px;}
+
+  .card{position:relative;z-index:1;max-width:440px;width:100%;}
+
+  .logo{
+    font-weight:900;font-size:22px;letter-spacing:.14em;
+    color:var(--or);text-transform:uppercase;margin-bottom:22px;
+    text-shadow:0 2px 0 rgba(0,0,0,.25);
+  }
+
+  h1{
+    font-size:32px;font-weight:900;line-height:1.12;margin-bottom:10px;
+    color:#fff;text-shadow:0 3px 0 var(--rouge-fonce),0 0 22px rgba(245,196,81,.3);
+  }
+  p{color:#FFE7E2;font-size:16.5px;line-height:1.55;margin-bottom:22px;}
+
+  .steps{
+    display:flex;justify-content:center;gap:10px;margin:0 0 20px;flex-wrap:wrap;
+  }
+  .step{
+    background:rgba(0,0,0,.22);border:1px solid rgba(245,196,81,.35);
+    border-radius:14px;padding:10px 12px;min-width:92px;
+  }
+  .step .n{font-size:22px;}
+  .step .t{font-size:12px;font-weight:700;color:var(--or-clair);margin-top:2px;}
+
+  .shot{
+    width:100%;max-width:300px;border-radius:18px;margin:4px auto 22px;
+    box-shadow:0 12px 34px rgba(0,0,0,.5);border:3px solid var(--or);
+    display:block;
+  }
+
+  .big{font-size:56px;font-weight:900;color:var(--or);margin:6px 0;
+       text-shadow:0 3px 0 var(--rouge-fonce);}
+
+  .spinner{
+    width:54px;height:54px;border-radius:50%;margin:22px auto;
+    border:6px solid rgba(255,255,255,.18);border-top-color:var(--or);
+    animation:sp 1s linear infinite;
+  }
+  @keyframes sp{to{transform:rotate(360deg)}}
+
+  .btn{
+    display:inline-block;margin-top:4px;cursor:pointer;border:0;text-decoration:none;
+    background:linear-gradient(180deg,var(--or-clair),var(--or) 55%,#D99A2B);
+    color:var(--sombre);font-weight:900;font-size:21px;
+    padding:18px 46px;border-radius:999px;
+    box-shadow:0 8px 0 var(--or-fonce), 0 16px 26px rgba(0,0,0,.4);
+    transition:transform .08s ease, box-shadow .08s ease;
+    animation:pulse 1.8s ease-in-out infinite;
+  }
+  .btn:active{transform:translateY(6px);box-shadow:0 2px 0 var(--or-fonce),0 8px 16px rgba(0,0,0,.4);}
+  @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+
+  .emoji{font-size:60px;margin-bottom:8px;filter:drop-shadow(0 6px 10px rgba(0,0,0,.35));}
+  .note{font-size:12px;color:rgba(255,255,255,.55);margin-top:28px;}
   .hidden{display:none;}
 </style>
 </head>
 <body>
   <div class="card">
-    <div id="checking"><div class="spinner"></div><p>Vérification…</p></div>
+    <div class="logo">🍔 Burger King</div>
 
-    <div id="ok" class="hidden">
-      <h1>C'est parti&nbsp;!</h1>
-      <p>Laissez-nous un avis sur Google, puis retournez à la borne : votre partie s'ouvre dans quelques secondes.</p>
-      <a id="goLink" class="btn" href="#">Laisser mon avis Google</a>
+    <!-- État : vérification -->
+    <div id="checking">
+      <div class="spinner"></div>
+      <p>Vérification en cours…</p>
     </div>
 
+    <!-- État : autorisé -> redirection -->
+    <div id="ok" class="hidden">
+      <h1>Plus qu'une étape&nbsp;!</h1>
+      <p>Laissez-nous un avis sur Google, puis revenez à la borne pour lancer la roue&nbsp;!</p>
+
+      <div class="steps">
+        <div class="step"><div class="n">📝</div><div class="t">1. Votre avis</div></div>
+        <div class="step"><div class="n">↩️</div><div class="t">2. Retour borne</div></div>
+        <div class="step"><div class="n">🎁</div><div class="t">3. Cadeau</div></div>
+      </div>
+
+      <img class="shot" src="avis.jpg" alt="Exemple d'avis Google"/>
+
+      <a id="goLink" class="btn" href="#">Laisser mon avis ⭐</a>
+    </div>
+
+    <!-- État : bloqué -->
     <div id="blocked" class="hidden">
+      <div class="emoji">⏳</div>
       <h1>Déjà joué&nbsp;!</h1>
-      <p>Une seule participation toutes les 12&nbsp;heures. Revenez dans&nbsp;:</p>
+      <p>Une seule participation toutes les 12&nbsp;heures.<br>Revenez dans&nbsp;:</p>
       <div class="big" id="remaining">—</div>
     </div>
 
+    <!-- État : erreur -->
     <div id="error" class="hidden">
+      <div class="emoji">😕</div>
       <h1>Oups</h1>
-      <p>Session introuvable. Rescannez le QR code sur la borne.</p>
+      <p>Session introuvable. Rescannez le QR code affiché sur la borne.</p>
     </div>
 
     <div class="note">Votre participation est enregistrée sur cet appareil.</div>
   </div>
 
 <script>
-  /* ===================== RÉGLAGES ===================== */
-  var REVIEW_URL = "https://www.google.com/maps"; // votre lien d'avis Google
-  /* =================================================== */
+  /* ===================== RÉGLAGE ===================== */
+  var REVIEW_URL = "https://www.google.com/maps"; // ← votre lien d'avis Google
+  /* ================================================== */
 
   function show(id){ ["checking","ok","blocked","error"].forEach(function(s){
       document.getElementById(s).classList.toggle("hidden", s!==id); }); }
@@ -84,7 +168,7 @@
       } else { show("error"); }
     }catch(e){ show("error"); }
   }
-  setTimeout(run, 500);
+  setTimeout(run, 700);
 </script>
 </body>
 </html>
